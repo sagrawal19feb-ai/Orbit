@@ -1,0 +1,4 @@
+## Orbit firmware component dependencies (managed by the IDF component manager)
+dependencies:
+  espressif/esp-sr: ==2.4.7            # wake word (MultiNet6 "Orbit") + esp-dsp
+  espressif/esp_websocket_client: ~1.8.0  # Gemini Live transport

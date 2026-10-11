@@ -1,0 +1,3 @@
+dependencies:
+  espressif/esp-sr: ==2.4.7
+  espressif/esp_websocket_client: ~1.8.0

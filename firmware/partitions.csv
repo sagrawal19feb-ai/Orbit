@@ -1,0 +1,10 @@
+# Orbit partition table — compacted so the standalone image stays small.
+# (The app is ~1.2 MB → 2 MB OTA slots are ample; assets holds the 3.6 MB
+#  wake-word model right after ota_1. Flash chip is still 16 MB.)
+# Name,   Type, SubType, Offset,   Size,     Flags
+nvs,      data, nvs,     0x9000,   0x4000,
+otadata,  data, ota,     0xd000,   0x2000,
+phy_init, data, phy,     0xf000,   0x1000,
+ota_0,    app,  ota_0,   0x20000,  0x200000,
+ota_1,    app,  ota_1,   0x220000, 0x200000,
+assets,   data, spiffs,  0x420000, 0x400000,

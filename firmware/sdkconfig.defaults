@@ -1,0 +1,52 @@
+# ---- Target: ESP32-S3 (same chip as the device backup) ----
+CONFIG_IDF_TARGET="esp32s3"
+
+# ---- Partition table: matches the device backup ----
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_OFFSET=0x8000
+
+# ---- Flash: 16 MB ----
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="16MB"
+
+# ---- PSRAM (module on the Orbit board) ----
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_BOOT_INIT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+# DO NOT enable the PSRAM boot memtest: on ESP32-S3 silicon rev v0.2 with the
+# embedded octal AP PSRAM (this board), esp_psram_extram_test() hard-hangs the
+# shared MSPI bus -> RTCWDT boot loop before app_main (esp-idf issue #18806).
+# The original device firmware has MEMTEST=n and works on the same silicon.
+# CONFIG_SPIRAM_MEMTEST is not set
+
+# ---- TLS: cert bundle for HTTPS (Jamendo/Deezer) & WSS (Gemini Live) ----
+CONFIG_ESP_TLS_USING_MBEDTLS=y
+CONFIG_ESP_CERT_BUNDLE=y
+CONFIG_ESP_CERT_BUNDLE_DEFAULT_FULL=y
+
+# ---- WiFi buffers (music streaming + websockets) ----
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=10
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=32
+CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM=32
+
+# ---- Misc ----
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+# No secondary console (USB-Serial-JTAG) — UART0 only, matches the setup the
+# serial monitor is attached to; removes USB init from the boot path.
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+# DEBUG level: IDF prints "calling init function: 0x… on core: N" for every
+# startup init fn — pinpoints any boot hang (bring-up build).
+CONFIG_LOG_DEFAULT_LEVEL_DEBUG=y
+
+# ---- Robust boot (hardware bring-up) ----
+# app_main runs the whole init chain (WiFi, multinet create, cJSON MCP tools)
+# on the main task — 3584 B (the IDF default) silently overflowed and hung the
+# boot before the first log line. 8192 B matches the original firmware.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+# crash loudly at the exact frame on any stack overflow (was: NONE)
+CONFIG_COMPILER_STACK_CHECK_MODE_NORM=y
